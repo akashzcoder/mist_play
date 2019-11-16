@@ -2,6 +2,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import psycopg2
+import numpy as np
 
 
 def _connect_to_db():
@@ -47,6 +48,8 @@ def _export_to_csv(file_path, df):
     num_of_columns = len(cols)
     cols.insert(num_of_columns - 1, cols.pop(cols.index('label')))
     df = df.reindex(columns=cols)
+    df = df[np.isfinite(df['user_gross_app'])]
+    _count_nans(df)
     fig, ax = plt.subplots()
     plt.xticks((0, 1))
     df.hist('label', ax=ax, bins=[-.5, .5, 1.5], ec="k")
@@ -58,6 +61,8 @@ def _create_histogram(hist):
     with open('histo.jpg', 'w') as file:
         file.write(list(hist))  # save 'hist' as a list string in a text file
 
+def _count_nans(df):
+    print(df.isnull().sum(axis=0))
 
 def main():
     df1 = _user_table('/home/asingh/workspace/mist_play/mist_play/data/user_table.csv')
