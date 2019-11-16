@@ -31,6 +31,10 @@ def _user_purchase_events(file_path: str):
     return df
 
 def _export_to_csv(file_path, df):
+    cols = list(df)
+    num_of_columns = len(cols)
+    cols.insert(num_of_columns-1, cols.pop(cols.index('label')))
+    df = df.reindex(columns=cols)
     df.to_csv(file_path)
 
 def main():
@@ -43,8 +47,6 @@ def main():
     df_final['label'].fillna(0, inplace=True)
     _export_to_csv(file_path='/home/asingh/workspace/mist_play/mist_play/data/labeled_data.csv', df=df_final)
     print(df_final)
-
-
 
 
 main()
