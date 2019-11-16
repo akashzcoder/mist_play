@@ -30,6 +30,9 @@ def _user_purchase_events(file_path: str):
     print(df.shape)
     return df
 
+def _export_to_csv(file_path, df):
+    df.to_csv(file_path)
+
 def main():
     df1 = _user_table('/home/asingh/workspace/mist_play/mist_play/data/user_table.csv')
     df2 = _user_app_statistics('/home/asingh/workspace/mist_play/mist_play/data/user_apps_statistics.csv')
@@ -38,6 +41,7 @@ def main():
     df3 = _user_purchase_events('/home/asingh/workspace/mist_play/mist_play/data/user_purchase_events.csv')
     df_final = pd.merge(df_interim, df3, on="user_id", how = 'outer')
     df_final['label'].fillna(0, inplace=True)
+    _export_to_csv(file_path='/home/asingh/workspace/mist_play/mist_play/data/labeled_data.csv', df=df_final)
     print(df_final)
 
 
