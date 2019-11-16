@@ -2,17 +2,42 @@
 import pandas as pd
 
 
-def _user_table_processing(file_path: str):
+def _user_table(file_path: str):
     # Read data from file 'filename.csv'
-    # (in the same directory that your python process is based)
-    # Control delimiters, rows, column names with read_csv (see later)
     df = pd.read_csv(file_path)
     df['bin_age'] = pd.Categorical(df['bin_age'])
     dfDummies = pd.get_dummies(df['bin_age'], prefix='age_category')
     df = pd.concat([df, dfDummies], axis=1)
-    # Preview the first 5 lines of the loaded data
-    # data = data.head()
-    print(df)
+    del df['Unnamed: 0'] # remove the
+    print(df.shape)
+    return df
+
+def _user_app_statistics(file_path: str):
+    df = pd.read_csv(file_path)
+    df['user_gross_app'] = df['n_topGrossingApps']/df['nTotal_Apps'] + df['n_shoppingApps']/df['nTotal_Apps']
+    del df['n_topGrossingApps']
+    del df['nTotal_Apps']
+    del df['n_shoppingApps']
+    del df['Unnamed: 0']
+    print(df.shape)
+    return df
 
 
-_user_table_processing('/home/asingh/workspace/mist_play/data/user_table.csv')
+def _user_purchase_events(file_path: str):
+    df = pd.read_csv(file_path)
+    del df['Unnamed: 0']
+    print(df.shape)
+    return df
+
+
+def main():
+    df1 = _user_table('/home/asingh/workspace/mist_play/mist_play/data/user_table.csv')
+    df2 = _user_app_statistics('/home/asingh/workspace/mist_play/mist_play/data/user_apps_statistics.csv')
+    df_interim = pd.merge(df1, df2, on="user_id", how = 'inner')
+    print(df_interim.shape)
+    df3 = _user_purchase_events('/home/asingh/workspace/mist_play/mist_play/data/user_purchase_events.csv')
+    df_final = pd.merge(df_interim, df3, on="user_id", how = 'outer')
+    print(df_final.shape)
+
+
+main()
