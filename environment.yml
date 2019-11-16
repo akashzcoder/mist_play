@@ -1,0 +1,6 @@
+name: mistplay
+channels:
+- defaults
+- conda-forge
+dependencies:
+  - pandas=0.22.0
