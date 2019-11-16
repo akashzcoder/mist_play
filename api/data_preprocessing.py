@@ -49,6 +49,10 @@ def _export_to_csv(file_path, df):
     cols.insert(num_of_columns - 1, cols.pop(cols.index('label')))
     df = df.reindex(columns=cols)
     df = df[np.isfinite(df['user_gross_app'])]
+    del df['bin_age']
+    del df['device_id']
+    del df['source_id']
+    del df['game_install_timezone']
     _count_nans(df)
     fig, ax = plt.subplots()
     plt.xticks((0, 1))
