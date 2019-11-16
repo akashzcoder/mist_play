@@ -1,7 +1,16 @@
 # Load the Pandas libraries with alias 'pd'
 import pandas as pd
 import matplotlib.pyplot as plt
+import psycopg2
 
+
+
+def _connect_to_db():
+    try:
+        conn = psycopg2.connect("dbname='postgres' user='test_user' host='postgres' password='test_psswd'")
+    except:
+        print("I am unable to connect to the database")
+        raise Exception
 
 def _user_table(file_path: str):
     # Read data from file 'filename.csv'

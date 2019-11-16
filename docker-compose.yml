@@ -1,0 +1,9 @@
+version: '3'
+services:
+  postgres:
+    image: postgres:10.4
+    restart: unless-stopped
+    environment:
+      POSTGRES_PASSWORD: test_psswd
+      POSTGRES_USER: test_user
+      POSTGRES_DB: postgres
