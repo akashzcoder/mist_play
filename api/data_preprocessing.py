@@ -53,6 +53,9 @@ def _export_to_csv(file_path, df):
     del df['device_id']
     del df['source_id']
     del df['game_install_timezone']
+    del df['installed_Mistplay_timezone']
+    del df['installed_Mistplay']
+
     _count_nans(df)
     fig, ax = plt.subplots()
     plt.xticks((0, 1))
