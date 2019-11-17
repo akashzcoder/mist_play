@@ -5,6 +5,10 @@ from datetime import datetime
 import psycopg2
 import numpy as np
 from sklearn.preprocessing import MinMaxScaler
+from sklearn.utils import shuffle
+from sklearn import model_selection
+from keras.models import Sequential
+from keras.layers import Dense
 
 
 def _connect_to_db():
@@ -61,6 +65,7 @@ def _export_to_csv(file_path, df):
     del df['game_install_timezone']
     del df['installed_Mistplay_timezone']
     del df['installed_Mistplay']
+    del df['os_version']
 
     _count_nans(df)
     fig, ax = plt.subplots()
@@ -74,6 +79,16 @@ def _create_histogram(hist):
     with open('histo.jpg', 'w') as file:
         file.write(list(hist))  # save 'hist' as a list string in a text file
 
+def _get_predictive_set(data):
+    data = shuffle(data)
+    i = 8
+    data_to_predict = data[:i].reset_index(drop = True)
+    predict_species = data_to_predict.label
+    predict_species = np.array(predict_species)
+    prediction = np.array(data_to_predict.drop(['label'],axis= 1))
+
+    data = data[i:].reset_index(drop = True)
+
 
 def _count_nans(df):
     """
@@ -85,18 +100,41 @@ def _count_nans(df):
 
 
 def main():
-    df1 = _user_table('/home/asingh/workspace/mist_play/mist_play/data/user_table.csv')
-    df2 = _user_app_statistics('/home/asingh/workspace/mist_play/mist_play/data/user_apps_statistics.csv')
+    df1 = _user_table('data/user_table.csv')
+    df2 = _user_app_statistics('data/user_apps_statistics.csv')
     df_interim = pd.merge(df1, df2, on="user_id", how='inner')
     print(df_interim.shape)
-    df3 = _user_purchase_events('/home/asingh/workspace/mist_play/mist_play/data/user_purchase_events.csv')
+    df3 = _user_purchase_events('data/user_purchase_events.csv')
     df_final = pd.merge(df_interim, df3, on="user_id", how='outer')
     df_final['label'].fillna(0, inplace=True)
     df_merge = sanitizeDates(df_final)
     scaler = MinMaxScaler()
-    df_merge[['user_gross_app']] = scaler.fit_transform(df_merge[['user_gross_app']])
-    _export_to_csv(file_path='/home/asingh/workspace/mist_play/mist_play/data/labeled_data.csv', df=df_merge)
-    print(df_final)
+    df_merge[['date']] = scaler.fit_transform(df_merge[['date']])
+    df_merge[['game_install_date']] = scaler.fit_transform(df_merge[['game_install_date']])
+    _get_predictive_set(df_merge)
+    _export_to_csv(file_path='data/labeled_data.csv', df=df_merge)
+    trainModel(df_merge)
+    #print(df_merge)
+
+def trainModel(data):
+
+    input = data.drop(['label'], axis = 1)
+    input = np.array(input)
+    result = data['label']
+    train_input, test_input, train_result, test_result = model_selection.train_test_split(input,result,test_size = 0.1, random_state = 0)
+
+    input_dim = len(data.columns) - 1
+    model = Sequential()
+    model.add(Dense(input_dim, input_dim = input_dim , activation = 'relu'))
+    model.add(Dense(20, activation = 'relu'))
+    model.add(Dense(10, activation = 'relu'))
+    model.add(Dense(1, activation = 'sigmoid'))
+
+    model.compile(loss = 'binary_crossentropy' , optimizer = 'adam' , metrics = ['binary_accuracy'] )
+
+    model.fit(train_input, train_result, epochs = 10, batch_size = 2)
+
+    scores = model.evaluate(train_result, test_result)
 
 
 def get_seconds(time_delta):
