@@ -1,6 +1,8 @@
 # Load the Pandas libraries with alias 'pd'
 import pandas as pd
 import matplotlib.pyplot as plt
+from datetime import datetime
+import numpy as np
 
 
 def _user_table(file_path: str):
@@ -46,16 +48,36 @@ def _create_histogram(hist):
     with open('histo.jpg', 'w') as file:
         file.write(list(hist))  # save 'hist' as a list string in a text file
 
+def get_seconds(time_delta):
+    return time_delta.seconds
+
+def sanitizeDates(df_merge):
+    epoch=datetime(1970,1,1)
+    df_merge['date'] = df_merge['date'].astype(str)
+    df_merge['date'] = (pd.to_datetime(df_merge['date'])-epoch).dt.total_seconds()#.values.astype('datetime64[ms]')
+    print(df_merge['date'][0])
+    df_merge['date']=df_merge['date']-(pd.to_datetime(df_merge['game_install_date'])-epoch).dt.total_seconds()#+pd.to_datetime(df_merge['game_install_timezone']).values.astype(np.int32)
+    df_merge['date']=df_merge['date']/(3600*24)
+
+    df_merge['game_install_date'] = df_merge['game_install_date'].astype(str)
+    df_merge['game_install_date'] = (pd.to_datetime(df_merge['game_install_date'])-epoch).dt.total_seconds()#.values.astype('datetime64[ms]')
+    print(df_merge['game_install_date'][0])
+    df_merge['game_install_date']=df_merge['game_install_date']-df_merge['installed_Mistplay']/1000#+pd.to_datetime(df_merge['game_install_timezone']).values.astype(np.int32)
+    df_merge['game_install_date']=df_merge['game_install_date']/(3600*24)
+    return df_merge
+
 def main():
-    df1 = _user_table('/home/asingh/workspace/mist_play/mist_play/data/user_table.csv')
-    df2 = _user_app_statistics('/home/asingh/workspace/mist_play/mist_play/data/user_apps_statistics.csv')
+    df1 = _user_table('data/user_table.csv')
+    df2 = _user_app_statistics('data/user_apps_statistics.csv')
     df_interim = pd.merge(df1, df2, on="user_id", how = 'inner')
     print(df_interim.shape)
-    df3 = _user_purchase_events('/home/asingh/workspace/mist_play/mist_play/data/user_purchase_events.csv')
-    df_final = pd.merge(df_interim, df3, on="user_id", how = 'outer')
-    df_final['label'].fillna(0, inplace=True)
-    _export_to_csv(file_path='/home/asingh/workspace/mist_play/mist_play/data/labeled_data.csv', df=df_final)
-    print(df_final)
+    df3 = _user_purchase_events('data/user_purchase_events.csv')
+    df_merge = pd.merge(df_interim, df3, on="user_id", how = 'outer')
+    df_merge['label'].fillna(0, inplace=True)
+    df_merge=sanitizeDates(df_merge)
+    print(df_merge['game_install_date'][0])
+    _export_to_csv(file_path='data/labeled_data.csv', df=df_merge)
+    print(df_merge)
 
 
 main()
