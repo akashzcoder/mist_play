@@ -5,6 +5,9 @@ from datetime import datetime
 import psycopg2
 import numpy as np
 from sklearn.preprocessing import MinMaxScaler
+from imblearn.over_sampling import SMOTE
+from sklearn.model_selection import train_test_split
+from sklearn.utils import resample
 
 
 def _connect_to_db():
@@ -75,6 +78,15 @@ def _create_histogram(hist):
         file.write(list(hist))  # save 'hist' as a list string in a text file
 
 
+def _data_balance(df):
+    X = df.drop('label', axis=1)
+    y = df['label']  # setting up testing and training sets
+    sm = SMOTE(random_state=27, ratio=1.0)
+    X, y = sm.fit_sample(X, y)
+    df_final = pd.concat([X, y], axis=1)
+    return df_final
+
+
 def _count_nans(df):
     """
     only to analyse the data for the number of nan values
@@ -95,6 +107,13 @@ def main():
     df_merge = sanitizeDates(df_final)
     scaler = MinMaxScaler()
     df_merge[['user_gross_app']] = scaler.fit_transform(df_merge[['user_gross_app']])
+    df_merge['amount_spend'].fillna('free', inplace=True)
+    del df_merge['amount_spend']
+    del df_merge['user_id']
+    del df_merge['os_version']
+    max = df_merge['date'].max()
+    df_merge['date'].fillna(max+20, inplace=True)
+    df_merge['gender'].fillna(1, inplace=True)
     _export_to_csv(file_path='/home/asingh/workspace/mist_play/mist_play/data/labeled_data.csv', df=df_merge)
     print(df_final)
 

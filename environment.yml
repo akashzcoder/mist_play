@@ -3,6 +3,7 @@ channels:
 - defaults
 - conda-forge
 dependencies:
+- imbalanced-learn=0.5.0=py_0
 - _libgcc_mutex=0.1=main
 - blas=1.0=mkl
 - ca-certificates=2019.10.16=0
@@ -49,6 +50,8 @@ dependencies:
 - pytz=2019.3=py_0
 - qt=5.9.6=h8703b6f_2
 - readline=7.0=h7b6447c_5
+- scikit-learn=0.20.0=py35h4989274_1
+- scipy=1.1.0=py35hfa4b5c9_1
 - setuptools=40.2.0=py35_0
 - sip=4.19.8=py35hf484d3e_0
 - six=1.11.0=py35_1
@@ -61,5 +64,6 @@ dependencies:
 - xz=5.2.4=h14c3975_4
 - zlib=1.2.11=h7b6447c_3
 - pip:
+  - joblib==0.14.0
   - mkl-fft==1.0.6
   - mkl-random==1.0.1
