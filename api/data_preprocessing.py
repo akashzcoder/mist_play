@@ -25,6 +25,7 @@ def _user_table(file_path: str):
     dfDummies2 = pd.get_dummies(df['country_id'], prefix='country_id')
     df = pd.concat([df, dfDummies2], axis=1)
     del df['Unnamed: 0']  # remove the
+    del df['country_id']  # remove the
     print(df.shape)
     return df
 
