@@ -69,6 +69,11 @@ def _create_histogram(hist):
         file.write(list(hist))  # save 'hist' as a list string in a text file
 
 def _count_nans(df):
+    """
+    only to analyse the data for the number of nan values
+    :param df:
+    :return: None
+    """
     print(df.isnull().sum(axis=0))
 
 def main():
