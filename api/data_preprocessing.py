@@ -21,6 +21,9 @@ def _user_table(file_path: str):
     df['bin_age'] = pd.Categorical(df['bin_age'])
     dfDummies = pd.get_dummies(df['bin_age'], prefix='age_category')
     df = pd.concat([df, dfDummies], axis=1)
+    df['country_id'] = pd.Categorical(df['country_id'])
+    dfDummies2 = pd.get_dummies(df['country_id'], prefix='country_id')
+    df = pd.concat([df, dfDummies2], axis=1)
     del df['Unnamed: 0']  # remove the
     print(df.shape)
     return df
