@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 from datetime import datetime
 import psycopg2
 import numpy as np
+from sklearn.preprocessing import MinMaxScaler
 
 
 def _connect_to_db():
@@ -92,6 +93,8 @@ def main():
     df_final = pd.merge(df_interim, df3, on="user_id", how='outer')
     df_final['label'].fillna(0, inplace=True)
     df_merge = sanitizeDates(df_final)
+    scaler = MinMaxScaler()
+    df_merge[['user_gross_app']] = scaler.fit_transform(df_merge[['user_gross_app']])
     _export_to_csv(file_path='/home/asingh/workspace/mist_play/mist_play/data/labeled_data.csv', df=df_merge)
     print(df_final)
 
