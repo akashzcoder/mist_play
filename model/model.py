@@ -3,8 +3,10 @@ from sklearn.model_selection import train_test_split
 from sklearn.utils import resample
 import pandas as pd
 #Import svm model
+import numpy as np
 from sklearn import svm
 from sklearn import metrics
+import matplotlib.pyplot as plt
 from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVC
 
@@ -31,7 +33,8 @@ def model(file_path):
     # Making the Confusion Matrix
     from sklearn.metrics import confusion_matrix
     cm = confusion_matrix(y_test, y_pred)
-    print(confusion_matrix)
+    print(cm)
+
 
 
 model(file_path='/home/asingh/workspace/mist_play/mist_play/data/labeled_data.csv')
