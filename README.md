@@ -20,7 +20,9 @@ Conda was used to create the virtual environment.
 
 ## Accomplishments that we're proud of
 
-Data Visualization and successful implementation of different classification models to distinguish between spending player over non-spending players with an accuracy of 90.6%.
+1. Data Visualization and successful implementation of different classification models to distinguish between spending player over non-spending players with an accuracy of 90.6%.
+2. Followed PEP8 standard
+3. Infrastructure setup
 
 ## Built With
 Python, HTML, bootstrap, javascript
