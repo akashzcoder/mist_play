@@ -1,6 +1,7 @@
 # Load the Pandas libraries with alias 'pd'
 import pandas as pd
 import matplotlib.pyplot as plt
+from datetime import datetime
 import psycopg2
 import numpy as np
 
@@ -11,6 +12,7 @@ def _connect_to_db():
     except:
         print("I am unable to connect to the database")
         raise Exception
+
 
 
 def _user_table(file_path: str):
@@ -68,6 +70,7 @@ def _create_histogram(hist):
     with open('histo.jpg', 'w') as file:
         file.write(list(hist))  # save 'hist' as a list string in a text file
 
+
 def _count_nans(df):
     """
     only to analyse the data for the number of nan values
@@ -84,8 +87,28 @@ def main():
     df3 = _user_purchase_events('/home/asingh/workspace/mist_play/mist_play/data/user_purchase_events.csv')
     df_final = pd.merge(df_interim, df3, on="user_id", how='outer')
     df_final['label'].fillna(0, inplace=True)
-    _export_to_csv(file_path='/home/asingh/workspace/mist_play/mist_play/data/labeled_data.csv', df=df_final)
+    df_merge = sanitizeDates(df_final)
+    _export_to_csv(file_path='/home/asingh/workspace/mist_play/mist_play/data/labeled_data.csv', df=df_merge)
     print(df_final)
+
+def get_seconds(time_delta):
+    return time_delta.seconds
+
+def sanitizeDates(df_merge):
+    epoch=datetime(1970,1,1)
+    df_merge['date'] = df_merge['date'].astype(str)
+    df_merge['date'] = (pd.to_datetime(df_merge['date'])-epoch).dt.total_seconds()#.values.astype('datetime64[ms]')
+    print(df_merge['date'][0])
+    df_merge['date']=df_merge['date']-(pd.to_datetime(df_merge['game_install_date'])-epoch).dt.total_seconds()#+pd.to_datetime(df_merge['game_install_timezone']).values.astype(np.int32)
+    df_merge['date']=df_merge['date']/(3600*24)
+
+    df_merge['game_install_date'] = df_merge['game_install_date'].astype(str)
+    df_merge['game_install_date'] = (pd.to_datetime(df_merge['game_install_date'])-epoch).dt.total_seconds()#.values.astype('datetime64[ms]')
+    print(df_merge['game_install_date'][0])
+    df_merge['game_install_date']=df_merge['game_install_date']-df_merge['installed_Mistplay']/1000#+pd.to_datetime(df_merge['game_install_timezone']).values.astype(np.int32)
+    df_merge['game_install_date']=df_merge['game_install_date']/(3600*24)
+    return df_merge
+
 
 
 main()
