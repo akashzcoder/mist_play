@@ -2,13 +2,15 @@ from imblearn.over_sampling import SMOTE
 from sklearn.model_selection import train_test_split
 from sklearn.utils import resample
 import pandas as pd
-#Import svm model
+import os
 import numpy as np
 from sklearn import svm
 from sklearn import metrics
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVC
+from os.path import dirname, abspath
+d = dirname(dirname(abspath(__file__)))
 
 
 def model(file_path):
@@ -36,5 +38,5 @@ def model(file_path):
     print(cm)
 
 
-
-model(file_path='/home/asingh/workspace/mist_play/mist_play/data/labeled_data.csv')
+file_path = os.path.join(d, "data", "labeled_data.csv")
+model(file_path=file_path)
